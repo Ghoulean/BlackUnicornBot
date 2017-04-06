@@ -51,7 +51,7 @@ var MetadataRetriever = {
 		return new Promise((resolve, reject) => {
 			if (fs.existsSync('songs/' + filename + '.mp3')) {
 				mmd(fs.createReadStream('songs/' + filename + '.mp3'), { duration: true }, function (err, metadata) {
-					let json = {'song': filename, 'type': 'mp3file', 'length': metadata.duration, 'displayName': metadata.title};
+					let json = {'song': filename, 'type': 'mp3file', 'length': Math.ceil(metadata.duration), 'displayName': metadata.title};
 					resolve(json);
 				});
 			} else {
@@ -59,9 +59,9 @@ var MetadataRetriever = {
 			}
 		});
 	},
-	getCache: () => {
+	getSongsList: () => {
 		return new Promise((resolve, reject) => {
-			fs.readdir(`${__dirname}/../song_metadata/`, (err, files) => {
+			fs.readdir(`${__dirname}/../songs/`, (err, files) => {
 				if (err) {
 					reject(`Error reading songs directory: ${err}`);
 				} else if (!files) {
@@ -69,14 +69,8 @@ var MetadataRetriever = {
 				} else {
 					let allSongNames = [];
 					for (let name of files) {
-						if (name.endsWith('.json')) {
-							name = name.replace(/\.json$/, '');
-							try {
-								let json = jsonfile.readFileSync('song_metadata/' + name + '.json');
-								allSongNames.push(json);
-							} catch (e) {
-								console.log(`getCache() error: ${e}`);
-							}
+						if (name.endsWith('.mp3')) {
+							allSongNames.push(name);
 						}
 					}
 					resolve(allSongNames);

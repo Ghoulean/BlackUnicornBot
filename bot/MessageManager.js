@@ -174,8 +174,8 @@ var commands = {
 				});
 		}
 	},
-	createplaylist: {
-		desc: 'Create a playlist',
+	saveplaylist: {
+		desc: 'Save a playlist',
 		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			suffix = utils.fmtFile(suffix);
@@ -269,39 +269,14 @@ var commands = {
 		desc: 'List all downloaded songs. Guarenteed high quality.',
 		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
-			MetadataRetriever.getCache()
+			MetadataRetriever.getSongsList()
 				.then((list) => {
 					let sendMsg = [];
 					for (let i = 0; i < list.length; i++){
-						sendMsg.push(`${i+1}. ${list[i].displayName}`);
+						sendMsg.push(`${i+1}. ${list[i]}`);
 					}
+					console.log(sendMsg);
 					utils.sendLongMessage(bot, msg, sendMsg.join('\n'));
-				})
-				.catch((e) => {
-					msg.channel.sendMessage('```' + `Error: ${e}` + '```');
-				});
-		}
-	},
-	info: {
-		desc: 'Get metadata of a song',
-		whitelist_only: true,
-		execute: (bot, msg, suffix) => {
-			if (!suffix) {
-				msg.channel.sendMessage('```Need song name```');
-				return;
-			}
-			MetadataRetriever.getCache()
-				.then((list) => {
-					let minDistance = Number.MAX_SAFE_INTEGER;
-					let obj = null;
-					for (let i = 0; i < list.length; i++){
-						let dist = utils.levenshtein(list[i].displayName, suffix);
-						if (dist < minDistance) {
-							minDistance = dist;
-							obj = list[i];
-						}
-					}
-					msg.channel.sendMessage('```' + `Name: ${obj.displayName}\nLength: ${utils.formatSeconds(obj.length)}\nID: ${obj.song}` + '```');
 				})
 				.catch((e) => {
 					msg.channel.sendMessage('```' + `Error: ${e}` + '```');

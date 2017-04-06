@@ -1,0 +1,22 @@
+{
+	"admin": {
+		"token": "",
+		"youtube_api_key": "",
+		"whitelisted_users": ["269925702571130880"]
+	},
+	"message": {
+		"command_prefix": "!",
+		"flag_prefix": "--",
+		"max_queue_display": 10,
+		"force_pm": true,
+		"list_limit": 10,
+		"errorMessage": "```An unknown error has occured. If this is reproducable, please report this to the owner ASAP.```"
+	},
+	"song": {
+		"max_length": 1200
+	},
+	"misc": {
+		"avatar": "./logo.png",
+		"playing_intro": ""
+	}
+}

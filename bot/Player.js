@@ -40,6 +40,11 @@ class _Player extends EventEmitter {
 				//this.dispatcher.end();
 			});
 		} else if (entry.type == 'mp3file') {
+			if (!fs.existsSync('songs/' + entry.song + '.mp3')) {
+				console.log('error: try to play song that no longer exists');
+				this.finishSong('song does not exist');
+				return;
+			}
 			this.dispatcher = this.connection.playFile('songs/' + entry.song + '.mp3', {volume: 0.15});
 		}
 			
@@ -54,34 +59,7 @@ class _Player extends EventEmitter {
             console.log('Discord voice chat error', e);
 			this.dispatcher.end();
         });
-		
-		/*
-		this.dispatcher.once('end', (a, b, c, d, e, f, g) => {
-			console.log(this.getCurrentTime(), a, b, c, d, e, f, g);
-		});
-		*/
-		/*
-		if (!fs.existsSync('songs/' + entry.song + '.mp3')) {
-			console.log('error: try to play song that no longer exists');
-			this.finishSong(e);
-			return;
-		}
-		
-		this.dispatcher = this.connection.playFile('songs/' + entry.song + '.mp4', {volume: 0.1});
 
-		this.dispatcher.once('end', (e) => {
-			//-1 accounts for rounding errors
-			if (!this.getPlaying()){
-				this.finishSong(e);
-				return;
-			}
-			if (this.getCurrentTime() >= this.getPlaying().length - 1 || this.getCurrentTime() <= 0) {
-				this.finishSong(e);
-				return;
-			}
-			//console.log('end', e);
-		});
-		*/
 		this.dispatcher.on('error', (e) => {
 			console.log('error in Player.js:', e);
 		});

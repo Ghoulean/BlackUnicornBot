@@ -108,7 +108,9 @@ exports.sendLongMessage = (bot, msg, outputStr, forcePM, splitChar) => { //note 
 		var timeoutWrapper = (strarr, ind) => {
 			if (ind < strarr.length) {
 				setTimeout(() => {
-					msg.author.sendMessage("```" + strarr[ind] + "```")
+					if (strarr[ind].trim().length > 0) {
+						msg.author.sendMessage("```" + strarr[ind] + "```")
+					}
 					timeoutWrapper(strarr, ind+1);
 				}, 1000);
 			}
@@ -137,6 +139,8 @@ exports.sendLongMessage = (bot, msg, outputStr, forcePM, splitChar) => { //note 
 		if (splitter.trim() != "") {
 			sendMsg[sendMsg.length - 1] = sendMsg[sendMsg.length - 1].substr(0, sendMsg[sendMsg.length - 1].length - 1);
 		}
+		
+		console.log(sendMsg);
 		
 		timeoutWrapper(sendMsg, 0);
 	} else {
