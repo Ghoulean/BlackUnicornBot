@@ -17,11 +17,20 @@ var MetadataRetriever = require('./MetadataRetriever.js');
 //Continue next song after current song finishes playing
 var autoContinue = true;
 
+//Notification channel - indicate song after a song ends
+var notificationChannel = null;
+
 Player.on('finishSong', () => {
 	if (!QueueHandler.isEmpty() && autoContinue){
 		let entry = QueueHandler.getFirst();
 		if (entry) {
 			Player.play(entry);
+			try {
+				notificationChannel.sendMessage('```' + `Now playing ${Player.getPlaying().displayName} [${utils.formatSeconds(Player.getPlaying().length)}] --${Player.getPlaying().source}` + "```");
+			} catch (e) {
+				console.log('error:', e, '; channel possibly deleted?');
+				notificationChannel = null;
+			}
 		}
 	}
 });
@@ -72,8 +81,11 @@ var commands = {
 		desc: 'Play songs in queue',
 		execute: (bot, msg, suffix) => {
 			
+			notificationChannel = msg.channel;
+			
 			if (Player.getPlaying()) {
 				Player.resume();
+				return;
 				//msg.channel.sendMessage('```Already playing```');
 			}
 			
@@ -99,12 +111,9 @@ var commands = {
 					Player.setConnection(connection);
 					if (!Player.getPlaying()) {
 						if (!QueueHandler.isEmpty()){
-							//QueueHandler.emit('playSong', QueueHandler.getFirst());
 							let entry = QueueHandler.getFirst();
-							console.log(entry);
 							Player.play(entry);
-							//msg.channel.sendMessage('```Playing...```');
-							commands.current.execute(bot, msg, suffix);
+							msg.channel.sendMessage('```' + `Now playing ${Player.getPlaying().displayName} [${utils.formatSeconds(Player.getPlaying().length)}] --${Player.getPlaying().source}` + "```");
 						} else {
 							msg.channel.sendMessage('```Queue is empty.```');
 						}
@@ -124,11 +133,12 @@ var commands = {
 				msg.channel.sendMessage('```Not currently playing```');
 				return;
 			}
-			msg.channel.sendMessage('```' + `Currently playing ${Player.getPlaying().displayName} [${utils.formatSeconds(Player.getCurrentTime())}/${utils.formatSeconds(Player.getPlaying().length)}]` + "```");
+			msg.channel.sendMessage('```' + `Currently playing ${Player.getPlaying().displayName} [${utils.formatSeconds(Player.getCurrentTime())}/${utils.formatSeconds(Player.getPlaying().length)}] --${Player.getPlaying().source}` + "```");
 		}
 	},
 	pause: {
 		desc: 'Pause the currently playing song',
+		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			Player.pause();
 			msg.channel.sendMessage('```Paused```');
@@ -136,16 +146,18 @@ var commands = {
 	},
 	skip: {
 		desc: 'Skip the currently playing song',
+		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			let skipThis = Player.getPlaying();
 			Player.pause();
 			Player.finishSong('skip');
 			msg.channel.sendMessage('```' + `Skipped ${skipThis.displayName}` + '```');
-			commands.current.execute(bot, msg, suffix);
+			//commands.current.execute(bot, msg, suffix);
 		}
 	},
 	stop: {
 		desc: 'Stop playing',
+		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			QueueHandler.clearQueue();
 			autoContinue = false;
@@ -165,7 +177,7 @@ var commands = {
 			PlaylistHandler.getPlaylist(suffix)
 				.then((list) => {
 					for (let i = 0; i < list.length; i++) {
-						QueueHandler.addQueue(list[i], 'playlist/'+suffix);
+						QueueHandler.addQueue(list[i], msg.author.username);
 					}
 					msg.channel.sendMessage('```Added the playlist ' + suffix + ' to the queue.```')
 				})
@@ -238,6 +250,7 @@ var commands = {
 	},
 	remove: {
 		desc: 'Remove a song from the queue',
+		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			if (!suffix) {
 				msg.channel.sendMessage('```Not a valid removal```');
@@ -266,7 +279,7 @@ var commands = {
 		}
 	},
 	listsongs: {
-		desc: 'List all downloaded songs. Guarenteed high quality.',
+		desc: 'List all locally downloaded songs.',
 		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			MetadataRetriever.getSongsList()
@@ -275,7 +288,6 @@ var commands = {
 					for (let i = 0; i < list.length; i++){
 						sendMsg.push(`${i+1}. ${list[i]}`);
 					}
-					console.log(sendMsg);
 					utils.sendLongMessage(bot, msg, sendMsg.join('\n'));
 				})
 				.catch((e) => {

@@ -1,4 +1,5 @@
 module.exports = (bot, msg, config, MessageManager) => {
+	//'whitelist' indicates whether the message author has whitelist permissions
 	let whitelist = false;
 	
 	//Ignore PM/DMs
@@ -19,7 +20,6 @@ module.exports = (bot, msg, config, MessageManager) => {
 		msg.content = msg.content.replace(' ', '');
 	}
 
-	
 	if (config.admin.whitelisted_users.indexOf(msg.author.id) >= 0) {
 		whitelist = true;
 	}
@@ -44,7 +44,7 @@ module.exports = (bot, msg, config, MessageManager) => {
 	}
 
 	//If command is whitelist-only, ensure that unauthorized users cannot execute it
-	if (!command.whitelist_only || whitelist) {
+	if (whitelist || (!command.whitelist_only && !config.message.whitelist_only)) {
 		command.execute(bot, msg, suffix);
 	} else {
 		msg.channel.sendMessage('```You do not have permissions to perform that command!```');

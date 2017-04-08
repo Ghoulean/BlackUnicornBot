@@ -23,7 +23,7 @@ class _Player extends EventEmitter {
 			return;
 		}
 	
-		this.setPlaying(entry);
+		this.setPlaying(entry);		
 		let stream;
 		
 		if (entry.type == 'youtube') {
@@ -36,7 +36,7 @@ class _Player extends EventEmitter {
 			});
 
 			stream.on('end', (e) => {
-				console.log('Video ended', e);
+				//console.log('Video ended', e);
 				//this.dispatcher.end();
 			});
 		} else if (entry.type == 'mp3file') {
@@ -49,8 +49,8 @@ class _Player extends EventEmitter {
 		}
 			
 		this.dispatcher.on('end', (e) => {
-			console.log(this.getCurrentTime());
-			console.log('dispatcher end', e);
+			//console.log(this.getCurrentTime());
+			//console.log('dispatcher end', e);
 			this.finishSong(e);
         });
 
