@@ -47,6 +47,17 @@ class Queue extends EventEmitter {
 		this.queue.splice(i, 1);
 	}
 	
+	shuffle() {
+		//Fisher-Yates (Knuth) shuffle
+		for (let i = this.queue.length-1; i > 0; i--) {
+			let j = Math.floor(Math.random() * i);
+			
+			let tempEntry = this.queue[i];
+			this.queue[i] = this.queue[j];
+			this.queue[j] = tempEntry;
+		}
+	}
+	
 }
 
 var QueueHandler = new Queue();

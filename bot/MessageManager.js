@@ -149,9 +149,10 @@ var commands = {
 		whitelist_only: true,
 		execute: (bot, msg, suffix) => {
 			let skipThis = Player.getPlaying();
+			msg.channel.sendMessage('```' + `Skipped ${skipThis.displayName}` + '```');
 			Player.pause();
 			Player.finishSong('skip');
-			msg.channel.sendMessage('```' + `Skipped ${skipThis.displayName}` + '```');
+			//msg.channel.sendMessage('```' + `Skipped ${skipThis.displayName}` + '```');
 			//commands.current.execute(bot, msg, suffix);
 		}
 	},
@@ -183,6 +184,24 @@ var commands = {
 				})
 				.catch((e) => {
 					msg.channel.sendMessage('```' + e + '```');
+				});
+		}
+	},
+	ytplaylist: {
+		desc: 'Save a playlist from YouTube',
+		whitelist_only: true,
+		execute: (bot, msg, suffix) => {
+			suffix = youtubePlaylistId(suffix);
+			msg.channel.sendMessage('```Parsing playlist... (this may take a while!)```');
+			PlaylistHandler.getYTPlaylist(suffix)
+				.then((list) => {
+					PlaylistHandler.savePlaylist(list, msg.author.username);
+				})
+				.then((resolve) => {
+					msg.channel.sendMessage('```Successfully saved playlist as ' + msg.author.username + '```');
+				})
+				.catch((e) => {
+					msg.channel.sendMessage('```Error: ' + e + '```');
 				});
 		}
 	},
@@ -278,6 +297,14 @@ var commands = {
 			msg.channel.sendMessage('```Cleared queue```');
 		}
 	},
+	shuffle: {
+		desc: 'Scramble the queue.',
+		whitelist_only: true,
+		execute: (bot, msg, suffix) => {
+			QueueHandler.shuffle();
+			msg.channel.sendMessage('```Shuffled queue```');
+		}
+	},
 	listsongs: {
 		desc: 'List all locally downloaded songs.',
 		whitelist_only: true,
@@ -296,10 +323,20 @@ var commands = {
 		}
 	}
 	
+	
 };
 
 function youtubeVideoId(string) {
 	var regex = /(?:\?v=|&v=|youtu\.be\/)(.*?)(?:\?|&|$)/;
+	var matches = string.match(regex);
+	if (matches) {
+		return matches[1];
+	}
+	return null;
+}
+
+function youtubePlaylistId(string) {
+	var regex = /^.*?(?:list)=(.*?)(?:&|$)/
 	var matches = string.match(regex);
 	if (matches) {
 		return matches[1];

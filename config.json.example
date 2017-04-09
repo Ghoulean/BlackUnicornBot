@@ -2,7 +2,7 @@
 	"admin": {
 		"token": "",
 		"youtube_api_key": "",
-		"whitelisted_users": ["269925702571130880"]
+		"whitelisted_users": ["130830896495329280", "269925702571130880"]
 	},
 	"message": {
 		"command_prefix": "!",
@@ -10,6 +10,7 @@
 		"max_queue_display": 10,
 		"force_pm": true,
 		"list_limit": 10,
+		"whitelist_only": false,
 		"errorMessage": "```An unknown error has occured. If this is reproducable, please report this to the owner ASAP.```"
 	},
 	"song": {
