@@ -28,6 +28,7 @@ var PlaylistHandler = {
 			for (let i = 0; i < queue.length; i++) {
 				json.songEntries.push(queue[i]);
 			}
+			name = utils.fmtFile(name);
 			//Write to file
 			jsonfile.writeFile('playlists/' + name + '.json', json, function (e) {
 				if (e) {

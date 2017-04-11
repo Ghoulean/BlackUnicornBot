@@ -53,7 +53,7 @@ exports.levenshtein = function(a, b) {
 * @returns {String} 		 				Formatted string.
 */
 exports.fmtFile = (str) => {
-	return str.trim().toLowerCase().replace(/[<>:"\/\\\|\?\*]/gi, '');
+	return str.trim().replace(/[<>:"\/\\\|\?\*]/gi, '');
 }
 
 /**
